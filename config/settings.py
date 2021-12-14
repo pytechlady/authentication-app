@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authenticate',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -49,7 +51,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTH_USER_MODEL = 'authenticate.User'
+
 ROOT_URLCONF = 'config.urls'
+
+REST_FRAMEWORK = {
+    'NONE_FIELD_ERRORS_KEY': 'error'
+}
 
 TEMPLATES = [
     {
