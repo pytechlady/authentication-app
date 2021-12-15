@@ -1,6 +1,6 @@
 from .models import User
 from rest_framework import generics, status
-from .serializers import RegisterSerializer, EmailVerificationSerializer, ForgotPasswordSerializer, PasswordResetSerializer
+from .serializers import RegisterSerializer, EmailVerificationSerializer, ForgotPasswordSerializer, PasswordResetSerializer, LogoutSerializer
 from rest_framework.response import Response
 from .utils import Util
 from django.contrib.sites.shortcuts import get_current_site
@@ -12,10 +12,6 @@ from .serializers import LoginSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 
-
-
-
-    
     
 class RegisterView(generics.GenericAPIView):
     
@@ -83,6 +79,7 @@ class LoginView(GenericAPIView):
         return Response(data={'token': token.key}, status=status.HTTP_200_OK)
     
 class LogoutView(generics.GenericAPIView):
+    serializer_class = LogoutSerializer
     
     def get(self, request):
         logout(request)
