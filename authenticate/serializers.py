@@ -29,3 +29,10 @@ class EmailVerificationSerializer(serializers.ModelSerializer):
         model = User
         fields = ['otp', 'email']
         
+
+class LoginSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        max_length=68, min_length=8, write_only=True)
+    class Meta:
+        model = User
+        fields = ('email', 'password')
