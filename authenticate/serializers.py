@@ -36,3 +36,17 @@ class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'password')
+        
+class ForgotPasswordSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    class Meta:
+        model = User
+        fields = ('email',)
+        
+class PasswordResetSerializer(serializers.Serializer):
+    email=serializers.EmailField(min_length=2)
+    otp=serializers.CharField(max_length=6)
+    password=serializers.CharField(min_length=8)
+    confirm_password=serializers.CharField(min_length=8)
+    class Meta:
+        fields=['email','otp','password','confirm_password']

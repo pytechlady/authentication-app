@@ -1,24 +1,20 @@
 from .models import User
-from rest_framework import generics, status, views
-from .serializers import RegisterSerializer, EmailVerificationSerializer
+from rest_framework import generics, status
+from .serializers import RegisterSerializer, EmailVerificationSerializer, ForgotPasswordSerializer, PasswordResetSerializer
 from rest_framework.response import Response
 from .utils import Util
 from django.contrib.sites.shortcuts import get_current_site
-import random
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from rest_framework import status, permissions
 from rest_framework.generics import GenericAPIView
 from rest_framework.authtoken.models import Token
 from .serializers import LoginSerializer
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
 
-def generate_otp(number):
-    min_val = 10 ** (number -1)
-    max_val = (10** number) -1
-    otp = random.randint(min_val, max_val)
-    return otp
+
     
     
 class RegisterView(generics.GenericAPIView):
@@ -34,7 +30,7 @@ class RegisterView(generics.GenericAPIView):
         
         user = User.object.get(email=user_data['email'])
         user_data = serializer.data
-        otp = generate_otp(6)
+        otp = Util.generate_otp(6)
         user.otp = otp
         user.save()
         current_site = get_current_site(request).domain
@@ -85,3 +81,70 @@ class LoginView(GenericAPIView):
         serializer = self.serializer_class(user)
         token, _ = Token.objects.get_or_create(user=user)
         return Response(data={'token': token.key}, status=status.HTTP_200_OK)
+    
+class LogoutView(generics.GenericAPIView):
+    
+    def get(self, request):
+        logout(request)
+        return Response(status=status.HTTP_200_OK)
+    
+    
+class ForgotPasswordView(generics.GenericAPIView):
+    serializer_class = ForgotPasswordSerializer
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = User.object.get(email=email)
+            
+        except ObjectDoesNotExist:
+            return Response({"message":"User does not exist"}, status=404)
+        OTP=Util.generate_otp(6)
+        user.otp = OTP
+        email = user.email
+        user.save()
+        if user.is_active == True:  
+            email_body = 'Hi '+user.username+'Here is the Otp code to reset your password \n' + str(OTP)
+            data = {'email_body':email_body, 'to_email':user.email, 'email_subject': 'verify your email'}
+            Util.send_email(data)
+            return Response({
+                "message": "success",
+                "errors": None
+            }, status=200)
+            
+class PasswordReset(generics.GenericAPIView):
+    serializer_class=PasswordResetSerializer
+    def put(self, request):
+        serializer=self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.data.get('email')
+        otp = serializer.data.get('otp')
+        password = request.data.get('password')
+        confirm_password =request.data.get('confirm_password')
+        try:
+            user = User.object.get(email=email)
+        except ObjectDoesNotExist:
+            return Response({"message":"User does not exist"}, status=404)
+        if password == confirm_password:
+            keygen=user.otp
+            OTP=keygen
+            if otp != OTP:  
+                return Response({
+                "message": "Failure",
+                "data": None,
+                "errors": {
+                    'otp_code': "Does not match or expired"
+                }
+            }, status=400)
+            user.set_password(password)
+            user.save()
+            return Response({
+                "message": "success",
+                "data": {
+                    "otp": None
+                },
+                "errors": None
+            }, status=200)
+        else:
+            return Response({"message":"Failure","data":None,"errors":{
+                "passwords": "The two Passwords must be the same"
+            }},status=400)
