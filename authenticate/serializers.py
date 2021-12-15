@@ -1,5 +1,7 @@
+from django.db.models.base import Model
 from rest_framework import serializers
 from .models import User
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -19,4 +21,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         return User.object.create_user(**validated_data)
+        
+        
+class EmailVerificationSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ['otp', 'email']
         
