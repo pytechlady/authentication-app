@@ -4,37 +4,20 @@
 
 ### Overview
 
-Authentication is the process of recognizing a user’s identity. It is the mechanism of associating an incoming request with a set of identifying credentials. The credentials provided are compared to those on a file in a database of the authorized user’s information on a local operating system or within an authentication server.
-
-### For Context
-
-We are to build a standalone full authentication API that can be used or injected into any application.
-
-### Required Endpoints
-
-1. Register
-2. Generate OTP
-3. OTP Verification endpoint.
-4. Login
-5. Logout
-6. Forgot password
-7. Reset password
+* This is a django rest-framework API projects that includes Register, OTP for user verification, OTP confirmation, Login, Login, Forgot password and also reset password end points. With this project users has to register with a valid email address as an OTP will be sent to the email to verify user. User would not be verified or be able to login if OTP is not confirmed
 
 ### Expectations
 
-- Your API design should fully conform with Restful API specification [read more](https://wiki.onap.org/display/DW/RESTful+API+Design+Specification)
-- Both request and response payload should be in JSON format
-- All API endpoints should have a consistent/uniform response format that provides a good user experience for API consumers
-- OTP should be 4 or 6 numeric characters
-- API should use bearer token (JWT or DRF token) for authorization
-- API should be documented using postman or swagger or README Markdown with examples
-- Github readme should be descriptive, detailed and clear and add a continuous integration badge(s)
-- All API endpoints should be tested
-- Set up a good continuous integration and deployment
-- A good Git workflow should be used and code should be committed in chunks
-- Ensure you download and read [Django for APIs](./assets/Django_for_APIs.pdf)
-- [OPTIONAL] → Set up a GitHub project management tool for application and self-management
+1. Register - User should be able to login using a valid and unique email address(email address that does not already exist in the database), a username and password.
 
-### Desired Authentication Flow
+2. Generate OTP - A 6 digits OTP will be sent to the email address provided during registration to verify that the email exist
 
-![Authentication Workflow](./assets/auth.png)
+3. OTP Verification endpoint - The OTP sent will then be used for confirmation, if valid user will then be verified and will be able to Login
+
+4. Login - User should be able able to login with the registered email and password once they receive the OTP and have been verified. A login token will be generated
+
+5. Logout - User should be able to logout out of session. The logout endpoint terminates the user session
+
+6. Forgot password - User should be able to request for password reset. A mail with a token for reset will be sent to the email provided if the email already exist in the database
+
+7. Reset password - User will use the token received to create a new password and then user will be able to login using the email and the new password created.
