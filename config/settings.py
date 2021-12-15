@@ -56,8 +56,12 @@ AUTH_USER_MODEL = 'authenticate.User'
 ROOT_URLCONF = 'config.urls'
 
 REST_FRAMEWORK = {
-    'NONE_FIELD_ERRORS_KEY': 'error'
+    'NONE_FIELD_ERRORS_KEY': 'error',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
+
 
 TEMPLATES = [
     {
@@ -131,3 +135,10 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'solveit37@gmail.com'
+EMAIL_HOST_PASSWORD = 'yomtok4reala'
