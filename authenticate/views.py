@@ -47,13 +47,13 @@ class VerifyEmail(generics.GenericAPIView):
         otp = data.get('otp', '')
         email = data.get('email', '')
         if otp is None or email is None:
-            return Response(errors=dict(invalid_input="Please provide both otp and email"), status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=dict(invalid_input="Please provide both otp and email"), status=status.HTTP_400_BAD_REQUEST)
         get_user = User.object.filter(email=email)
         if not get_user.exists():
-            return Response(errors=dict(invalid_email = "please provide a valid registered email"), status=status.HTTP_400_BAD_REQUEST )
+            return Response(data=dict(invalid_email = "please provide a valid registered email"), status=status.HTTP_400_BAD_REQUEST )
         user = get_user[0] 
         if user.otp != otp:
-            return Response(errors=dict(invalid_otp = "please provide a valid otp code"), status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=dict(invalid_otp = "please provide a valid otp code"), status=status.HTTP_400_BAD_REQUEST)
         user.is_verified = True
        
         user.save()
@@ -68,12 +68,12 @@ class LoginView(GenericAPIView):
         email = request.data.get('email', '')
         password = request.data.get('password', '')
         if email is None or password is None:
-            return Response(errors={'invalid_credentials': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'invalid_credentials': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
         user = authenticate(username=email, password=password)
         if not user:
-            return Response(errors={'invalid_credentials': 'Ensure both email and password are correct and you have verify you account'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'invalid_credentials': 'Ensure both email and password are correct and you have verify you account'}, status=status.HTTP_400_BAD_REQUEST)
         if not user.is_verified:
-            return Response(errors={'invalid_credentials': 'Please verify your account'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'invalid_credentials': 'Please verify your account'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.serializer_class(user)
         token, _ = Token.objects.get_or_create(user=user)
         return Response(data={'token': token.key}, status=status.HTTP_200_OK)
@@ -129,13 +129,13 @@ class PasswordReset(generics.GenericAPIView):
                 "message": "Failure",
                 "data": None,
                 "errors": {
-                    'otp_code': "Does not match or expired"
+                    'otp_code': "OTP does not match or expired"
                 }
             }, status=400)
             user.set_password(password)
             user.save()
             return Response({
-                "message": "success",
+                "message": 'success! Password reset successful' ,
                 "data": {
                     "otp": None
                 },
